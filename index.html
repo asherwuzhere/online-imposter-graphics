@@ -199,6 +199,29 @@
       background-color: #9575cd;
     }
     
+    #restartGameBtn {
+      background-color: var(--teal);
+      margin-top: 1.5em;
+      padding: 1em 2em;
+      font-size: 1.1em;
+    }
+    
+    #restartGameBtn:hover {
+      background-color: #26a69a;
+    }
+    
+    #mainQuestionInAnswers {
+      font-size: 1.3em;
+      font-weight: 600;
+      color: var(--coral);
+      margin: 1em 0;
+      padding: 1em;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: var(--rounded);
+      box-shadow: var(--shadow);
+      display: none;
+    }
+    
     #waitForOthers, #postVoteWait {
       padding: 1em;
       margin: 1em 0;
@@ -289,15 +312,16 @@
   <!-- READ ANSWERS -->
   <div id="readAnswers" class="hidden">
     <h2>Everyone's Answers</h2>
+    <div id="mainQuestionInAnswers"></div>
     <ul id="answerList"></ul>
     <button id="revealMainBtn" class="hidden">Reveal Main Question</button>
+    <button id="goToVotingBtn" class="hidden">Go to Voting</button>
   </div>
 
   <!-- MAIN REVEAL -->
   <div id="mainReveal" class="hidden">
     <h2>MAIN QUESTION</h2>
     <p id="mainQuestionDisplay"></p>
-    <button id="goToVotingBtn" class="hidden">Go to Voting</button>
   </div>
 
   <!-- VOTING PHASE -->
@@ -317,6 +341,7 @@
   <div id="revealPhase" class="hidden">
     <h2>Imposter Reveal</h2>
     <div id="revealText">Calculating votes...</div>
+    <button id="restartGameBtn" class="hidden">Start New Game</button>
   </div>
 
   <!-- Single-File JS w/ Firebase -->
@@ -387,9 +412,404 @@
       {
         q1: "What's your favorite season and why?",
         q2: "What's your favorite holiday and why?"
+      },
+      {
+        q1: "If you could only eat one food for the rest of your life, what would it be?",
+        q2: "What's your go-to comfort food?"
+      },
+      {
+        q1: "What's your favorite mode of transportation?",
+        q2: "What's your dream car?"
+      },
+      {
+        q1: "How old were you when you got your first smartphone?",
+        q2: "How old were you when you got your first pet?"
+      },
+      {
+        q1: "What's something you're really good at?",
+        q2: "What's something you wish you were better at?"
+      },
+      {
+        q1: "What's your go-to karaoke song?",
+        q2: "What artist have you seen perform live most often?"
+      },
+      {
+        q1: "How do you prefer to exercise?",
+        q2: "What's your favorite sport to watch?"
+      },
+      {
+        q1: "What's your ideal weekend activity?",
+        q2: "What do you typically do to relax after a stressful day?"
+      },
+      {
+        q1: "What's your favorite type of museum to visit?",
+        q2: "What's your favorite type of restaurant to eat at?"
+      },
+      {
+        q1: "What's a skill you taught yourself?",
+        q2: "What's something you've always wanted to learn?"
+      },
+      {
+        q1: "How many countries have you visited?",
+        q2: "How many states or provinces have you visited in your home country?"
+      },
+      {
+        q1: "What was your favorite subject in school?",
+        q2: "What was your least favorite subject in school?"
+      },
+      {
+        q1: "What's the longest you've gone without sleep?",
+        q2: "What's the longest road trip you've taken?"
+      },
+      {
+        q1: "What's your most-used app on your phone?",
+        q2: "What website do you visit most frequently?"
+      },
+      {
+        q1: "What's the best concert you've ever attended?",
+        q2: "What's the best movie you've seen in theaters?"
+      },
+      {
+        q1: "How would you spend a million dollars?",
+        q2: "If you won the lottery, what's the first thing you would buy?"
+      },
+      {
+        q1: "What's your favorite time of day?",
+        q2: "Are you a morning person or a night owl?"
+      },
+      {
+        q1: "What's your favorite dessert?",
+        q2: "What's your favorite breakfast food?"
+      },
+      {
+        q1: "What was your childhood dream job?",
+        q2: "What would be your dream job now?"
+      },
+      {
+        q1: "What's the best piece of advice you've ever received?",
+        q2: "What's a life lesson you had to learn the hard way?"
+      },
+      {
+        q1: "What's something you collect?",
+        q2: "What's the most valuable thing you own that isn't worth much money?"
+      },
+      {
+        q1: "What's your favorite way to spend time outdoors?",
+        q2: "What's your favorite indoor activity on a rainy day?"
+      },
+      {
+        q1: "What's a tradition your family has?",
+        q2: "What's a tradition you'd like to start?"
+      },
+      {
+        q1: "If you could instantly become an expert in something, what would it be?",
+        q2: "If you could have any superpower, what would it be?"
+      },
+      {
+        q1: "What was the last book you read?",
+        q2: "What was the last movie you watched?"
+      },
+      {
+        q1: "What's something that's popular that you don't understand the appeal of?",
+        q2: "What's something you enjoy that most people don't?"
+      },
+      {
+        q1: "How long does it usually take you to get ready in the morning?",
+        q2: "How long is your typical commute to work or school?"
+      },
+      {
+        q1: "What's your favorite type of music?",
+        q2: "What was the first album or song you purchased?"
+      },
+      {
+        q1: "What's your favorite thing about where you live?",
+        q2: "Where would you most like to live someday?"
+      },
+      {
+        q1: "What are you most proud of?",
+        q2: "What's your biggest accomplishment from the past year?"
+      },
+      {
+        q1: "What's your favorite childhood game?",
+        q2: "What's your favorite video game?"
+      },
+      {
+        q1: "What's something that always makes you laugh?",
+        q2: "What's the best joke you know?"
+      },
+      {
+        q1: "What's something you know a lot about?",
+        q2: "What topic could you give a 20-minute presentation on without preparation?"
+      },
+      {
+        q1: "What's your favorite item of clothing that you own?",
+        q2: "What's an item you've had for the longest time?"
+      },
+      {
+        q1: "What skill do you think everyone should learn?",
+        q2: "What's something everyone should experience at least once?"
+      },
+      {
+        q1: "What's the best compliment you've ever received?",
+        q2: "What's something nice someone did for you recently?"
+      },
+      {
+        q1: "What's your favorite smell?",
+        q2: "What smell brings back the strongest memories for you?"
+      },
+      {
+        q1: "What's the most spontaneous thing you've ever done?",
+        q2: "What's the most daring thing you've ever done?"
+      },
+      {
+        q1: "What are three items you would bring to a deserted island?",
+        q2: "What are three things you couldn't live without for a week?"
+      },
+      {
+        q1: "If you could time travel, what year would you visit?",
+        q2: "If you could live in any historical period, which would you choose?"
+      },
+      {
+        q1: "What animal do you think would make the best pet if it was domesticated?",
+        q2: "If you could be any animal for a day, what would you choose?"
+      },
+      {
+        q1: "What's your favorite way to spend a day off?",
+        q2: "What's your ideal vacation?"
+      },
+      {
+        q1: "What's a fear you've overcome?",
+        q2: "What's something that scares you but you'd like to try anyway?"
+      },
+      {
+        q1: "Who was your childhood hero?",
+        q2: "Who do you admire most now?"
+      },
+      {
+        q1: "What's your favorite word?",
+        q2: "What's a word or phrase you say too often?"
+      },
+      {
+        q1: "What's something you've created that you're proud of?",
+        q2: "What's a project you'd like to work on someday?"
+      },
+      {
+        q1: "What would your perfect day look like?",
+        q2: "What are three things that would make tomorrow great?"
+      },
+      {
+        q1: "What's something you've always wanted to try but haven't yet?",
+        q2: "What's on your bucket list?"
+      },
+      {
+        q1: "What's the best piece of technology you own?",
+        q2: "What's a piece of technology you wish existed?"
+      },
+      {
+        q1: "What's something that made you smile recently?",
+        q2: "What's something you're looking forward to?"
+      },
+      {
+        q1: "How many languages do you speak?",
+        q2: "What language would you like to learn?"
+      },
+      {
+        q1: "What's your favorite quote?",
+        q2: "What's a saying or phrase that you live by?"
+      },
+      {
+        q1: "What's the most interesting fact you know?",
+        q2: "What's something surprising about you that most people don't know?"
+      },
+      {
+        q1: "What's your earliest memory?",
+        q2: "What's a vivid memory from your childhood?"
+      },
+      {
+        q1: "If you could master one musical instrument, which would you choose?",
+        q2: "If you could sing a duet with any musician, who would it be?"
+      },
+      {
+        q1: "What's the most beautiful place you've ever seen?",
+        q2: "What's a place you find peaceful?"
+      },
+      {
+        q1: "What habit would you like to break?",
+        q2: "What habit would you like to develop?"
+      },
+      {
+        q1: "What's the best meal you've ever had?",
+        q2: "What's a food you've always wanted to try?"
+      },
+      {
+        q1: "What's your favorite thing about your job or studies?",
+        q2: "What would you change about your job or studies if you could?"
+      },
+      {
+        q1: "What's something you've done that you never thought you would?",
+        q2: "What's something you never thought you'd enjoy but ended up loving?"
+      },
+      {
+        q1: "What's a small thing that makes your day better?",
+        q2: "What's a small inconvenience that always annoys you?"
+      },
+      {
+        q1: "How many pillows do you sleep with?",
+        q2: "Do you make your bed every morning?"
+      },
+      {
+        q1: "What's your favorite board game?",
+        q2: "What's your favorite outdoor game?"
+      },
+      {
+        q1: "What's a song that always puts you in a good mood?",
+        q2: "What's a song that always makes you emotional?"
+      },
+      {
+        q1: "What's the longest you've gone without checking your phone?",
+        q2: "What's the longest you've gone without using the internet?"
+      },
+      {
+        q1: "What's something you learned recently?",
+        q2: "What's something you'd like to learn more about?"
+      },
+      {
+        q1: "What was your favorite toy as a child?",
+        q2: "What was your favorite TV show as a child?"
+      },
+      {
+        q1: "What do you think is your best physical feature?",
+        q2: "What personality trait are you most proud of?"
+      },
+      {
+        q1: "How often do you try new foods?",
+        q2: "How adventurous would you say you are with trying new things?"
+      },
+      {
+        q1: "What's the most unusual food you've ever eaten?",
+        q2: "What's a food from another culture you enjoy?"
+      },
+      {
+        q1: "What's a cause you're passionate about?",
+        q2: "What's something you would stand in line for hours to get?"
+      },
+      {
+        q1: "What's your favorite type of art?",
+        q2: "If you could own any piece of art, what would it be?"
+      },
+      {
+        q1: "What's the best surprise you've ever received?",
+        q2: "What's the best surprise you've ever planned for someone else?"
+      },
+      {
+        q1: "What's the oldest item you own?",
+        q2: "What's something you own that has sentimental value?"
+      },
+      {
+        q1: "What's your favorite thing about your hometown?",
+        q2: "What's something unique about where you grew up?"
+      },
+      {
+        q1: "What age would you choose to remain forever if you could?",
+        q2: "If you could go back to any age for a day, what would it be?"
+      },
+      {
+        q1: "What's the best birthday gift you've ever received?",
+        q2: "How do you usually celebrate your birthday?"
+      },
+      {
+        q1: "What's a rule you think everyone should follow?",
+        q2: "What's a rule you think is meant to be broken?"
+      },
+      {
+        q1: "What's your favorite time of year?",
+        q2: "What weather makes you the happiest?"
+      },
+      {
+        q1: "What do you think is the greatest invention of all time?",
+        q2: "What invention do you think has done more harm than good?"
+      },
+      {
+        q1: "What fictional character do you most identify with?",
+        q2: "What fictional world would you most like to live in?"
+      },
+      {
+        q1: "What is your favorite way to pass time while traveling?",
+        q2: "What is your favorite way to pass time when you're alone?"
+      },
+      {
+        q1: "What's your favorite family recipe?",
+        q2: "What's a dish you're known for making?"
+      },
+      {
+        q1: "What chore do you hate the most?",
+        q2: "What chore do you mind the least?"
+      },
+      {
+        q1: "What's the most challenging thing you've ever done?",
+        q2: "What's something you failed at but learned from?"
+      },
+      {
+        q1: "What's the best money you've ever spent?",
+        q2: "What's the worst purchase you've ever made?"
+      },
+      {
+        q1: "If you could speak to your younger self, what advice would you give?",
+        q2: "What do you think your future self would want to tell you now?"
+      },
+      {
+        q1: "What's the most valuable life skill you possess?",
+        q2: "What's a skill you wish was taught in school but isn't?"
+      },
+      {
+        q1: "What's a good habit you have?",
+        q2: "What's a bad habit you've broken?"
+      },
+      {
+        q1: "How many plants do you have in your home?",
+        q2: "How many photos are displayed in your home?"
+      },
+      {
+        q1: "What's the longest you've kept a New Year's resolution?",
+        q2: "What's a goal you're currently working toward?"
+      },
+      {
+        q1: "What would your autobiography be titled?",
+        q2: "If a movie was made about your life, who would play you?"
+      },
+      {
+        q1: "What's your go-to dance move?",
+        q2: "If you were in a talent show, what would your talent be?"
+      },
+      {
+        q1: "What's a stereotype about your profession that isn't true?",
+        q2: "What's a stereotype about your hobby that isn't true?"
+      },
+      {
+        q1: "What's something that took you way too long to figure out?",
+        q2: "What's something obvious that you didn't notice until someone pointed it out?"
+      },
+      {
+        q1: "What's the most difficult ethical question you've had to answer?",
+        q2: "What's the hardest decision you've ever had to make?"
+      },
+      {
+        q1: "How many languages do you speak?",
+        q2: "How many instruments can you play?"
+      },
+      {
+        q1: "What's your favorite pizza topping?",
+        q2: "What's your favorite ice cream flavor?"
+      },
+      {
+        q1: "What's the last thing you searched for online?",
+        q2: "What's the most interesting thing you've read recently?"
+      },
+      {
+        q1: "What brand are you most loyal to?",
+        q2: "What's a product you would never use a generic version of?"
       }
     ];
-
     // DOM references
     const homeDiv       = document.getElementById('home');
     const rulesDiv      = document.getElementById('rules');
@@ -670,14 +1090,45 @@
     // Read Answers
     document.getElementById("revealMainBtn").onclick = () => {
       if (isHost) {
-        update(ref(db, `lobbies/${lobbyCode}`), { phase: "mainReveal" });
+        revealMainQuestion();
       }
     };
+
+    async function revealMainQuestion() {
+      try {
+        const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
+        const snapshot = await get(gameDataRef);
+        
+        if (!snapshot.exists()) {
+          console.error("Game data not found");
+          return;
+        }
+        
+        const gameData = snapshot.val();
+        const mainQuestionEl = document.getElementById("mainQuestionInAnswers");
+        mainQuestionEl.innerText = `Main Question: ${gameData.mainQuestion}`;
+        mainQuestionEl.style.display = "block";
+        
+        document.getElementById("revealMainBtn").classList.add("hidden");
+        document.getElementById("goToVotingBtn").classList.remove("hidden");
+        
+        if (isHost && gameData.mainQuestion) {
+          speak(`The main question was: ${gameData.mainQuestion}`);
+        }
+      } catch (error) {
+        console.error("Error revealing main question:", error);
+      }
+    }
 
     async function loadAnswers() {
       try {
         const ansListEl = document.getElementById("answerList");
         ansListEl.innerHTML = "";
+        
+        // Reset the main question display
+        const mainQuestionEl = document.getElementById("mainQuestionInAnswers");
+        mainQuestionEl.innerText = "";
+        mainQuestionEl.style.display = "none";
         
         const qSnap = await get(ref(db, `lobbies/${lobbyCode}/questions`));
         if (!qSnap.exists()) {
@@ -694,10 +1145,14 @@
 
         // Only host sees the Reveal Main button
         const revealBtn = document.getElementById("revealMainBtn");
+        const goToVotingBtn = document.getElementById("goToVotingBtn");
+        
         if (isHost) {
           revealBtn.classList.remove("hidden");
+          goToVotingBtn.classList.add("hidden");
         } else {
           revealBtn.classList.add("hidden");
+          goToVotingBtn.classList.add("hidden");
         }
       } catch (error) {
         console.error("Error loading answers:", error);
@@ -726,14 +1181,6 @@
         
         if (isHost && gameData.mainQuestion) {
           speak(`The main question was: ${gameData.mainQuestion}`);
-        }
-        
-        // Only host sees the Go To Voting button
-        const goToVotingBtn = document.getElementById("goToVotingBtn");
-        if (isHost) {
-          goToVotingBtn.classList.remove("hidden");
-        } else {
-          goToVotingBtn.classList.add("hidden");
         }
       } catch (error) {
         console.error("Error loading main reveal:", error);
@@ -831,6 +1278,38 @@
       });
     }
 
+    // Restart Game
+    document.getElementById("restartGameBtn").onclick = restartGame;
+
+    async function restartGame() {
+      if (!isHost) return;
+      
+      try {
+        // Reset the game state but keep the players
+        const snapshot = await get(ref(db, `lobbies/${lobbyCode}/players`));
+        if (!snapshot.exists()) {
+          console.error("No players found for restart");
+          return;
+        }
+        
+        await update(ref(db, `lobbies/${lobbyCode}`), {
+          phase: "lobby",
+          mainQuestion: null,
+          imposterQuestion: null,
+          imposter: null,
+          questionIndex: null,
+          isFirstQuestionMain: null,
+          questions: null
+        });
+        
+        // Go back to lobby
+        enterLobby();
+      } catch (error) {
+        console.error("Error restarting game:", error);
+        alert("Error restarting game: " + error.message);
+      }
+    }
+
     // Reveal
     async function loadReveal() {
       try {
@@ -913,6 +1392,13 @@
         html += `<p>The imposter was <strong>${imposter}</strong>, and their question was: "${gameData.imposterQuestion}"</p>`;
     
         revealEl.innerHTML = html;
+        
+        // Show restart button for host
+        if (isHost) {
+          document.getElementById("restartGameBtn").classList.remove("hidden");
+        } else {
+          document.getElementById("restartGameBtn").classList.add("hidden");
+        }
       } catch (error) {
         console.error("Error loading reveal:", error);
       }
