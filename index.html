@@ -121,18 +121,44 @@
     #voteList button {
       margin-right: 1em;
       background-color: var(--lavender);
+      min-width: 100px;
+      flex-shrink: 0;
     }
     
     #voteList button:hover {
       background-color: #9575cd;
     }
     
+    .vote-answer-container {
+      flex-grow: 1;
+      text-align: left;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+    
+    .vote-player-name {
+      font-weight: 600;
+      color: var(--coral);
+      margin-right: 0.25em;
+    }
+    
+    .voting-main-question {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: var(--coral);
+      margin: 0.5em 0 1.5em 0;
+      padding: 1em;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: var(--rounded);
+      box-shadow: var(--shadow);
+    }
+    
     .answer-display { 
       color: #555; 
       font-style: italic; 
-      margin-left: 0.5em;
+      margin-left: 0.25em;
       flex-grow: 1;
-      text-align: left;
     }
     
     #home, #rules, #lobby, #questionPhase, #readAnswers, #mainReveal, #votingPhase, #postVoteWait, #revealPhase {
@@ -227,6 +253,15 @@
       margin: 1em 0;
       background-color: rgba(179, 157, 219, 0.3);
       border-radius: var(--rounded);
+    }
+    
+    #postVoteWait {
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow);
+    }
+    
+    #postVoteWait h2 {
+      color: var(--teal);
     }
     
     #revealText p {
@@ -810,6 +845,7 @@
         q2: "What's a product you would never use a generic version of?"
       }
     ];
+
     // DOM references
     const homeDiv       = document.getElementById('home');
     const rulesDiv      = document.getElementById('rules');
@@ -1013,6 +1049,23 @@
           loadReveal();
         }
       });
+      
+      // Also listen for the main question revealed state
+      const mainQuestionRevealedRef = ref(db, `lobbies/${lobbyCode}/mainQuestionRevealed`);
+      onValue(mainQuestionRevealedRef, async snapshot => {
+        if (!snapshot.exists() || !snapshot.val()) return;
+        
+        // Only update if we're in the answers phase and the question is newly revealed
+        const phaseSnap = await get(ref(db, `lobbies/${lobbyCode}/phase`));
+        if (phaseSnap.exists() && phaseSnap.val() === "readAnswers") {
+          const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
+          const gameDataSnap = await get(gameDataRef);
+          
+          if (gameDataSnap.exists() && gameDataSnap.val().mainQuestion) {
+            showMainQuestion(gameDataSnap.val().mainQuestion);
+          }
+        }
+      });
     }
 
     // Question Phase
@@ -1105,18 +1158,32 @@
         }
         
         const gameData = snapshot.val();
-        const mainQuestionEl = document.getElementById("mainQuestionInAnswers");
-        mainQuestionEl.innerText = `Main Question: ${gameData.mainQuestion}`;
-        mainQuestionEl.style.display = "block";
         
-        document.getElementById("revealMainBtn").classList.add("hidden");
-        document.getElementById("goToVotingBtn").classList.remove("hidden");
+        // Update the Firebase state to indicate the main question is revealed
+        // This will trigger the state change for all connected players
+        await update(ref(db, `lobbies/${lobbyCode}`), { 
+          mainQuestionRevealed: true 
+        });
+        
+        // Update the UI
+        showMainQuestion(gameData.mainQuestion);
         
         if (isHost && gameData.mainQuestion) {
           speak(`The main question was: ${gameData.mainQuestion}`);
         }
       } catch (error) {
         console.error("Error revealing main question:", error);
+      }
+    }
+
+    function showMainQuestion(question) {
+      const mainQuestionEl = document.getElementById("mainQuestionInAnswers");
+      mainQuestionEl.innerText = `Main Question: ${question}`;
+      mainQuestionEl.style.display = "block";
+      
+      document.getElementById("revealMainBtn").classList.add("hidden");
+      if (isHost) {
+        document.getElementById("goToVotingBtn").classList.remove("hidden");
       }
     }
 
@@ -1129,6 +1196,17 @@
         const mainQuestionEl = document.getElementById("mainQuestionInAnswers");
         mainQuestionEl.innerText = "";
         mainQuestionEl.style.display = "none";
+        
+        const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
+        const gameDataSnap = await get(gameDataRef);
+        if (gameDataSnap.exists()) {
+          const gameData = gameDataSnap.val();
+          
+          // If the main question is already revealed, show it
+          if (gameData.mainQuestionRevealed && gameData.mainQuestion) {
+            showMainQuestion(gameData.mainQuestion);
+          }
+        }
         
         const qSnap = await get(ref(db, `lobbies/${lobbyCode}/questions`));
         if (!qSnap.exists()) {
@@ -1143,13 +1221,20 @@
           ansListEl.appendChild(li);
         }
 
-        // Only host sees the Reveal Main button
+        // Only host sees the Reveal Main button if it's not already revealed
         const revealBtn = document.getElementById("revealMainBtn");
         const goToVotingBtn = document.getElementById("goToVotingBtn");
         
+        const mainQuestionRevealed = gameDataSnap.exists() && gameDataSnap.val().mainQuestionRevealed;
+        
         if (isHost) {
-          revealBtn.classList.remove("hidden");
-          goToVotingBtn.classList.add("hidden");
+          if (!mainQuestionRevealed) {
+            revealBtn.classList.remove("hidden");
+            goToVotingBtn.classList.add("hidden");
+          } else {
+            revealBtn.classList.add("hidden");
+            goToVotingBtn.classList.remove("hidden");
+          }
         } else {
           revealBtn.classList.add("hidden");
           goToVotingBtn.classList.add("hidden");
@@ -1218,6 +1303,17 @@
           return;
         }
         const answerData = answersSnap.val();
+        
+        // Get the main question for display at the top
+        const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
+        const gameDataSnap = await get(gameDataRef);
+        if (gameDataSnap.exists() && gameDataSnap.val().mainQuestion) {
+          // Add the main question at the top of the voting page
+          const mainQuestionDiv = document.createElement("div");
+          mainQuestionDiv.className = "voting-main-question";
+          mainQuestionDiv.textContent = `Main Question: ${gameDataSnap.val().mainQuestion}`;
+          list.parentNode.insertBefore(mainQuestionDiv, list);
+        }
     
         // Check if player has already voted
         const myVoteSnap = await get(ref(db, `lobbies/${lobbyCode}/questions/${playerName}/vote`));
@@ -1233,15 +1329,28 @@
           if (p !== playerName) {
             const li = document.createElement("li");
             const playerAnswer = answerData[p] ? answerData[p].answer : "No answer";
+            
             const btn = document.createElement("button");
             btn.textContent = `Vote ${p}`;
             btn.onclick = () => submitVote(p);
+            
+            const answerContainer = document.createElement("div");
+            answerContainer.className = "vote-answer-container";
+            
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "vote-player-name";
+            nameSpan.textContent = p;
+            
+            const answerSpan = document.createElement("span");
+            answerSpan.className = "answer-display";
+            answerSpan.textContent = playerAnswer;
+            
             li.appendChild(btn);
-            li.appendChild(document.createTextNode(` - Answer: `));
-            const span = document.createElement("span");
-            span.className = "answer-display";
-            span.textContent = `"${playerAnswer}"`;
-            li.appendChild(span);
+            answerContainer.appendChild(nameSpan);
+            answerContainer.appendChild(document.createTextNode(": "));
+            answerContainer.appendChild(answerSpan);
+            li.appendChild(answerContainer);
+            
             list.appendChild(li);
           }
         });
@@ -1299,7 +1408,8 @@
           imposter: null,
           questionIndex: null,
           isFirstQuestionMain: null,
-          questions: null
+          questions: null,
+          mainQuestionRevealed: false
         });
         
         // Go back to lobby
