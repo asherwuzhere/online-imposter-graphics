@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Online Imposter Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #FFB74D;
+      --coral: #FF8A65;
+      --blue: #64B5F6;
+      --teal: #4DB6AC;
+      --lavender: #B39DDB;
+      --dark-text: #333;
+      --light-text: #fff;
+      --light-bg: #f9f9f9;
+      --shadow: 0 4px 8px rgba(0,0,0,0.1);
+      --rounded: 12px;
+    }
+    
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      text-align: center; 
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--teal) 100%);
+      color: var(--dark-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    h1, h2, h3 {
+      color: var(--dark-text);
+      margin-top: 0.5em;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      background: -webkit-linear-gradient(var(--coral), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.3em;
+    }
+    
+    input, button { 
+      margin: 0.5em; 
+      padding: 0.8em 1.2em; 
+      font-size: 1em; 
+      border: none;
+      border-radius: var(--rounded);
+      font-family: 'Poppins', sans-serif;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+    
+    input {
+      background-color: rgba(255, 255, 255, 0.9);
+      width: 80%;
+      max-width: 300px;
+    }
+    
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.5);
+    }
+    
+    button {
+      background-color: var(--coral);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      min-width: 120px;
+    }
+    
+    button:hover {
+      background-color: var(--orange);
+      transform: translateY(-2px);
+    }
+    
+    .hidden { 
+      display: none; 
+    }
+    
+    #lobbyCodeDisplay { 
+      font-weight: bold; 
+      color: var(--coral);
+      font-size: 1.5em;
+      letter-spacing: 2px;
+    }
+    
+    ul { 
+      list-style-type: none; 
+      padding: 0; 
+      margin: 1em auto;
+      width: 90%;
+      max-width: 500px;
+    }
+    
+    li { 
+      margin: 0.8em 0;
+      padding: 0.8em;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: var(--rounded);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease;
+    }
+    
+    li:hover {
+      transform: translateY(-2px);
+    }
+    
+    #voteList li {
+      display: flex;
+      align-items: center;
+      padding: 0.5em 1em;
+    }
+    
+    #voteList button {
+      margin-right: 1em;
+      background-color: var(--lavender);
+    }
+    
+    #voteList button:hover {
+      background-color: #9575cd;
+    }
+    
+    .answer-display { 
+      color: #555; 
+      font-style: italic; 
+      margin-left: 0.5em;
+      flex-grow: 1;
+      text-align: left;
+    }
+    
+    #home, #rules, #lobby, #questionPhase, #readAnswers, #mainReveal, #votingPhase, #postVoteWait, #revealPhase {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 2em;
+      border-radius: var(--rounded);
+      box-shadow: var(--shadow);
+      width: 90%;
+      max-width: 600px;
+      margin: 1em auto;
+    }
+    
+    #playerQuestion, #mainQuestionDisplay {
+      font-size: 1.3em;
+      font-weight: 600;
+      color: var(--coral);
+      margin: 1em 0;
+      padding: 1em;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: var(--rounded);
+      box-shadow: var(--shadow);
+    }
+    
+    #answerField {
+      width: 90%;
+      max-width: 400px;
+    }
+    
+    #markReadyBtn {
+      background-color: var(--blue);
+    }
+    
+    #markReadyBtn:hover {
+      background-color: #42a5f5;
+    }
+    
+    #createBtn {
+      background-color: var(--teal);
+    }
+    
+    #createBtn:hover {
+      background-color: #26a69a;
+    }
+    
+    #joinBtn {
+      background-color: var(--blue);
+    }
+    
+    #joinBtn:hover {
+      background-color: #42a5f5;
+    }
+    
+    #startGameBtn, #revealMainBtn, #goToVotingBtn {
+      background-color: var(--orange);
+      margin-top: 1em;
+      padding: 1em 2em;
+    }
+    
+    #rulesBtn, #backHomeBtn {
+      background-color: var(--lavender);
+    }
+    
+    #rulesBtn:hover, #backHomeBtn:hover {
+      background-color: #9575cd;
+    }
+    
+    #waitForOthers, #postVoteWait {
+      padding: 1em;
+      margin: 1em 0;
+      background-color: rgba(179, 157, 219, 0.3);
+      border-radius: var(--rounded);
+    }
+    
+    #revealText p {
+      padding: 0.5em;
+      margin: 0.5em 0;
+      border-radius: var(--rounded);
+      background-color: rgba(255, 255, 255, 0.7);
+    }
+    
+    #revealText strong {
+      color: var(--coral);
+    }
+    
+    @media (max-width: 600px) {
+      body {
+        padding: 1em;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+      
+      input, button {
+        padding: 0.6em 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HOME SCREEN -->
+  <div id="home">
+    <h1>Imposter Game</h1>
+    <p><b>Create or Join a Lobby</b></p>
+    <input id="nameInput" placeholder="Your Name">
+    <br>
+    <button id="createBtn">Create Lobby</button>
+    <br>
+    <input id="joinCodeInput" placeholder="Enter Lobby Code">
+    <button id="joinBtn">Join Lobby</button>
+    <br><br>
+    <button id="rulesBtn">Rules</button>
+  </div>
+
+  <!-- RULES SCREEN -->
+  <div id="rules" class="hidden">
+    <h2>How to Play</h2>
+    <p>
+      1. One player creates a lobby and shares the code. Everyone else joins with that code.<br>
+      2. The host starts the game once there are at least 3 players.<br>
+      3. Each player gets a question. One random player is the Imposter and gets a slightly different question.<br>
+      4. Everyone types their answer secretly. Once all are ready, everyone's answers are revealed.<br>
+      5. Then the main question is revealed. Only the host's browser will read it aloud; everyone sees it on screen.<br>
+      6. Vote on who you think the Imposter is. The results will show who was voted out, and if they were the Imposter.<br>
+      7. Have fun deducing who is lying!
+    </p>
+    <p>
+      <strong>Note:</strong> Answers are typed privately. The Imposter tries to blend in by giving an answer that fits the main question they <em>did not</em> actually see.
+    </p>
+    <button id="backHomeBtn">Back to Home</button>
+  </div>
+
+  <!-- LOBBY SCREEN -->
+  <div id="lobby" class="hidden">
+    <h2>Lobby Code: <span id="lobbyCodeDisplay"></span></h2>
+    <h3>Players:</h3>
+    <ul id="playerList"></ul>
+    <button id="startGameBtn" class="hidden">Start Game</button>
+  </div>
+
+  <!-- QUESTION PHASE -->
+  <div id="questionPhase" class="hidden">
+    <h2>Your Question</h2>
+    <p id="playerQuestion"></p>
+    <div id="answerContainer">
+      <input id="answerField" placeholder="Type your answer..."/><br>
+      <button id="markReadyBtn">I've Written My Answer</button>
+    </div>
+    <div id="waitForOthers" class="hidden">
+      <p>Waiting for everyone else to finish...</p>
+    </div>
+  </div>
+
+  <!-- READ ANSWERS -->
+  <div id="readAnswers" class="hidden">
+    <h2>Everyone's Answers</h2>
+    <ul id="answerList"></ul>
+    <button id="revealMainBtn" class="hidden">Reveal Main Question</button>
+  </div>
+
+  <!-- MAIN REVEAL -->
+  <div id="mainReveal" class="hidden">
+    <h2>MAIN QUESTION</h2>
+    <p id="mainQuestionDisplay"></p>
+    <button id="goToVotingBtn" class="hidden">Go to Voting</button>
+  </div>
+
+  <!-- VOTING PHASE -->
+  <div id="votingPhase" class="hidden">
+    <h2>Vote for the Imposter</h2>
+    <p>Choose who you think received a different question:</p>
+    <ul id="voteList"></ul>
+  </div>
+
+  <!-- POST-VOTE WAIT SCREEN (LOCAL ONLY) -->
+  <div id="postVoteWait" class="hidden">
+    <h2>Thanks for voting!</h2>
+    <p>Waiting for everyone else to finish...</p>
+  </div>
+
+  <!-- REVEAL PHASE -->
+  <div id="revealPhase" class="hidden">
+    <h2>Imposter Reveal</h2>
+    <div id="revealText">Calculating votes...</div>
+  </div>
+
+  <!-- Single-File JS w/ Firebase -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js';
+    import {
+      getDatabase, ref, set, update, get, onValue, off
+    } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA3JrnVvOPto_aQ95MasBEd68-du6gJmCA",
+      authDomain: "online-imposter.firebaseapp.com",
+      databaseURL: "https://online-imposter-default-rtdb.firebaseio.com",
+      projectId: "online-imposter",
+      storageBucket: "online-imposter.firebasestorage.app",
+      messagingSenderId: "925601269436",
+      appId: "1:925601269436:web:661f6b53a754b5ccbc32b9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let playerName = "";
+    let lobbyCode = "";
+    let isHost = false;
+    let questionPair = null;
+    let imposter = "";
+    let allQuestionsRef = null;
+
+    // Question pairs for the game
+    const questions = [
+      {
+        q1: "How many times have you been horseback riding in your life?",
+        q2: "How many sleepaway camps have you been to?"
+      },
+      {
+        q1: "What's your favorite board game?",
+        q2: "What's your favorite card game?"
+      },
+      {
+        q1: "What's the most interesting place you've traveled to?",
+        q2: "What's your dream vacation destination?"
+      },
+      {
+        q1: "How many books do you read in a typical year?",
+        q2: "How many movies do you watch in a typical month?"
+      },
+      {
+        q1: "What was your first job?",
+        q2: "What was your worst job?"
+      },
+      {
+        q1: "What's your favorite childhood memory?",
+        q2: "What's the most embarrassing thing that happened to you as a child?"
+      },
+      {
+        q1: "If you could have dinner with any historical figure, who would it be?",
+        q2: "If you could have any fictional character as a best friend, who would it be?"
+      },
+      {
+        q1: "What's the best gift you've ever received?",
+        q2: "What's the best gift you've ever given someone?"
+      },
+      {
+        q1: "How many hours of sleep do you typically get each night?",
+        q2: "How many cups of coffee do you drink in a typical day?"
+      },
+      {
+        q1: "What's your favorite season and why?",
+        q2: "What's your favorite holiday and why?"
+      }
+    ];
+
+    // DOM references
+    const homeDiv       = document.getElementById('home');
+    const rulesDiv      = document.getElementById('rules');
+    const lobbyDiv      = document.getElementById('lobby');
+    const questionDiv   = document.getElementById('questionPhase');
+    const answersDiv    = document.getElementById('readAnswers');
+    const mainDiv       = document.getElementById('mainReveal');
+    const votingDiv     = document.getElementById('votingPhase');
+    const postVoteDiv   = document.getElementById('postVoteWait');
+    const revealDiv     = document.getElementById('revealPhase');
+
+    function showDiv(divID) {
+      [
+        homeDiv, rulesDiv, lobbyDiv,
+        questionDiv, answersDiv, mainDiv,
+        votingDiv, postVoteDiv, revealDiv
+      ].forEach(d => d.classList.add('hidden'));
+      document.getElementById(divID).classList.remove('hidden');
+    }
+
+    // Home screen
+    document.getElementById('createBtn').onclick = createLobby;
+    document.getElementById('joinBtn').onclick   = joinLobby;
+    document.getElementById('rulesBtn').onclick  = () => showDiv('rules');
+    document.getElementById('backHomeBtn').onclick = () => showDiv('home');
+
+    async function createLobby() {
+      playerName = document.getElementById("nameInput").value.trim();
+      if (!playerName) {
+        alert("Please enter a name.");
+        return;
+      }
+      lobbyCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+      isHost = true;
+
+      try {
+        await set(ref(db, `lobbies/${lobbyCode}`), {
+          players: { [playerName]: true },
+          host: playerName,
+          phase: "lobby"
+        });
+        enterLobby();
+      } catch (error) {
+        alert("Error creating lobby: " + error.message);
+      }
+    }
+
+    async function joinLobby() {
+      playerName = document.getElementById("nameInput").value.trim();
+      lobbyCode  = document.getElementById("joinCodeInput").value.trim().toUpperCase();
+      if (!playerName || !lobbyCode) {
+        alert("Please enter name and lobby code.");
+        return;
+      }
+
+      try {
+        const lobbyRef = ref(db, `lobbies/${lobbyCode}`);
+        const snapshot = await get(lobbyRef);
+
+        if (!snapshot.exists()) {
+          alert("Lobby not found.");
+          return;
+        }
+
+        const lobbyData = snapshot.val();
+        
+        // Check if name is already taken
+        if (lobbyData.players && lobbyData.players[playerName]) {
+          alert("That name is already taken in this lobby.");
+          return;
+        }
+
+        isHost = (lobbyData.host === playerName);
+        await update(ref(db, `lobbies/${lobbyCode}/players`), {
+          [playerName]: true
+        });
+        
+        enterLobby();
+      } catch (error) {
+        alert("Error joining lobby: " + error.message);
+      }
+    }
+
+    function enterLobby() {
+      showDiv("lobby");
+      document.getElementById("lobbyCodeDisplay").innerText = lobbyCode;
+
+      const playerList = document.getElementById("playerList");
+      const playersRef = ref(db, `lobbies/${lobbyCode}/players`);
+      
+      onValue(playersRef, snapshot => {
+        playerList.innerHTML = '';
+        if (snapshot.exists()) {
+          const players = Object.keys(snapshot.val());
+          players.forEach(p => {
+            const li = document.createElement("li");
+            li.innerText = p + (p === playerName ? " (You)" : "");
+            playerList.appendChild(li);
+          });
+        }
+      });
+
+      const startBtn = document.getElementById("startGameBtn");
+      if (isHost) {
+        startBtn.classList.remove("hidden");
+        startBtn.onclick = startGame;
+      } else {
+        startBtn.classList.add("hidden");
+      }
+
+      listenForPhaseChange();
+    }
+
+    async function startGame() {
+      try {
+        const snap = await get(ref(db, `lobbies/${lobbyCode}/players`));
+        if (!snap.exists()) {
+          alert("Error: No players found.");
+          return;
+        }
+        
+        const players = Object.keys(snap.val() || {});
+
+        if (players.length < 3) {
+          alert('You need at least 3 players to start!');
+          return;
+        }
+
+        // Pick a random imposter
+        imposter = players[Math.floor(Math.random() * players.length)];
+        
+        // Select a random question pair
+        const randomQuestionIndex = Math.floor(Math.random() * questions.length);
+        const selectedQuestionPair = questions[randomQuestionIndex];
+        
+        // Randomly decide which question is the main and which is the imposter question
+        const isFirstQuestionMain = Math.random() >= 0.5;
+        
+        const mainQuestion = isFirstQuestionMain ? selectedQuestionPair.q1 : selectedQuestionPair.q2;
+        const imposterQuestion = isFirstQuestionMain ? selectedQuestionPair.q2 : selectedQuestionPair.q1;
+        
+        // Store the questions and imposter for reference later
+        await update(ref(db, `lobbies/${lobbyCode}`), {
+          mainQuestion: mainQuestion,
+          imposterQuestion: imposterQuestion,
+          imposter: imposter,
+          questionIndex: randomQuestionIndex,
+          isFirstQuestionMain: isFirstQuestionMain
+        });
+
+        // Assign questions to each player
+        for (const p of players) {
+          const q = (p === imposter) ? imposterQuestion : mainQuestion;
+          await set(ref(db, `lobbies/${lobbyCode}/questions/${p}`), {
+            question: q,
+            answer: "",
+            ready: false,
+            vote: null
+          });
+        }
+
+        // Move to question phase
+        await update(ref(db, `lobbies/${lobbyCode}`), { phase: "questionPhase" });
+      } catch (error) {
+        alert("Error starting game: " + error.message);
+      }
+    }
+
+    function listenForPhaseChange() {
+      const phaseRef = ref(db, `lobbies/${lobbyCode}/phase`);
+      onValue(phaseRef, snapshot => {
+        if (!snapshot.exists()) return;
+        
+        const phase = snapshot.val();
+        
+        // Clear any existing listeners when changing phases
+        if (allQuestionsRef) {
+          off(allQuestionsRef);
+          allQuestionsRef = null;
+        }
+
+        if (phase === "lobby") showDiv("lobby");
+        else if (phase === "questionPhase") {
+          showDiv("questionPhase");
+          loadQuestion();
+        }
+        else if (phase === "readAnswers") {
+          showDiv("readAnswers");
+          loadAnswers();
+        }
+        else if (phase === "mainReveal") {
+          showDiv("mainReveal");
+          loadMainReveal();
+        }
+        else if (phase === "votingPhase") {
+          showDiv("votingPhase");
+          loadVoting();
+        }
+        else if (phase === "revealPhase") {
+          showDiv("revealPhase");
+          loadReveal();
+        }
+      });
+    }
+
+    // Question Phase
+    document.getElementById("markReadyBtn").onclick = markReady;
+
+    async function loadQuestion() {
+      try {
+        const myQuestionRef = ref(db, `lobbies/${lobbyCode}/questions/${playerName}`);
+        const qSnap = await get(myQuestionRef);
+        
+        if (!qSnap.exists()) {
+          console.error("Question not found for player");
+          return;
+        }
+
+        const questionObj = qSnap.val();
+        document.getElementById("playerQuestion").innerText = questionObj.question;
+        
+        if (questionObj.ready) {
+          // Already submitted an answer
+          document.getElementById("answerContainer").classList.add("hidden");
+          document.getElementById("waitForOthers").classList.remove("hidden");
+        } else {
+          // Need to submit an answer
+          document.getElementById("answerContainer").classList.remove("hidden");
+          document.getElementById("waitForOthers").classList.add("hidden");
+          document.getElementById("answerField").value = questionObj.answer || "";
+        }
+
+        // Setup listener to check if all players are ready
+        setupAllReadyListener();
+      } catch (error) {
+        console.error("Error loading question:", error);
+      }
+    }
+
+    function setupAllReadyListener() {
+      allQuestionsRef = ref(db, `lobbies/${lobbyCode}/questions`);
+      onValue(allQuestionsRef, snapshot => {
+        if (!snapshot.exists()) return;
+        
+        const questionData = snapshot.val();
+        const allReady = Object.values(questionData).every(p => p.ready);
+        
+        if (allReady) {
+          // Everyone is ready, move to next phase
+          update(ref(db, `lobbies/${lobbyCode}`), { phase: "readAnswers" });
+        }
+      });
+    }
+
+    async function markReady() {
+      const inputEl = document.getElementById("answerField");
+      const answer = inputEl.value.trim();
+      if (!answer) {
+        alert("Please type an answer!");
+        return;
+      }
+
+      try {
+        // Submit to DB
+        await update(ref(db, `lobbies/${lobbyCode}/questions/${playerName}`), {
+          ready: true,
+          answer: answer
+        });
+
+        // Hide input, show waiting text
+        document.getElementById("answerContainer").classList.add("hidden");
+        document.getElementById("waitForOthers").classList.remove("hidden");
+      } catch (error) {
+        alert("Error submitting answer: " + error.message);
+      }
+    }
+
+    // Read Answers
+    document.getElementById("revealMainBtn").onclick = () => {
+      if (isHost) {
+        update(ref(db, `lobbies/${lobbyCode}`), { phase: "mainReveal" });
+      }
+    };
+
+    async function loadAnswers() {
+      try {
+        const ansListEl = document.getElementById("answerList");
+        ansListEl.innerHTML = "";
+        
+        const qSnap = await get(ref(db, `lobbies/${lobbyCode}/questions`));
+        if (!qSnap.exists()) {
+          console.error("No answers found");
+          return;
+        }
+
+        const allQs = qSnap.val();
+        for (const [pName, obj] of Object.entries(allQs)) {
+          const li = document.createElement("li");
+          li.textContent = `${pName}: ${obj.answer}`;
+          ansListEl.appendChild(li);
+        }
+
+        // Only host sees the Reveal Main button
+        const revealBtn = document.getElementById("revealMainBtn");
+        if (isHost) {
+          revealBtn.classList.remove("hidden");
+        } else {
+          revealBtn.classList.add("hidden");
+        }
+      } catch (error) {
+        console.error("Error loading answers:", error);
+      }
+    }
+
+    // Main Reveal
+    document.getElementById("goToVotingBtn").onclick = () => {
+      if (isHost) {
+        update(ref(db, `lobbies/${lobbyCode}`), { phase: "votingPhase" });
+      }
+    };
+
+    async function loadMainReveal() {
+      try {
+        const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
+        const snapshot = await get(gameDataRef);
+        
+        if (!snapshot.exists()) {
+          console.error("Game data not found");
+          return;
+        }
+        
+        const gameData = snapshot.val();
+        document.getElementById("mainQuestionDisplay").innerText = gameData.mainQuestion;
+        
+        if (isHost && gameData.mainQuestion) {
+          speak(`The main question was: ${gameData.mainQuestion}`);
+        }
+        
+        // Only host sees the Go To Voting button
+        const goToVotingBtn = document.getElementById("goToVotingBtn");
+        if (isHost) {
+          goToVotingBtn.classList.remove("hidden");
+        } else {
+          goToVotingBtn.classList.add("hidden");
+        }
+      } catch (error) {
+        console.error("Error loading main reveal:", error);
+      }
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const msg = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(msg);
+      }
+    }
+
+    // Voting
+    let hasVoted = false;
+    
+    async function loadVoting() {
+      try {
+        const list = document.getElementById("voteList");
+        list.innerHTML = "";
+        hasVoted = false;
+    
+        const playersSnap = await get(ref(db, `lobbies/${lobbyCode}/players`));
+        if (!playersSnap.exists()) {
+          console.error("No players found");
+          return;
+        }
+        
+        const playerNames = Object.keys(playersSnap.val());
+    
+        // Get all player answers
+        const answersSnap = await get(ref(db, `lobbies/${lobbyCode}/questions`));
+        if (!answersSnap.exists()) {
+          console.error("No answers found");
+          return;
+        }
+        const answerData = answersSnap.val();
+    
+        // Check if player has already voted
+        const myVoteSnap = await get(ref(db, `lobbies/${lobbyCode}/questions/${playerName}/vote`));
+        if (myVoteSnap.exists() && myVoteSnap.val()) {
+          hasVoted = true;
+          showDiv("postVoteWait");
+          setupAllVotedListener();
+          return;
+        }
+    
+        // Create voting buttons for all players except self
+        playerNames.forEach(p => {
+          if (p !== playerName) {
+            const li = document.createElement("li");
+            const playerAnswer = answerData[p] ? answerData[p].answer : "No answer";
+            const btn = document.createElement("button");
+            btn.textContent = `Vote ${p}`;
+            btn.onclick = () => submitVote(p);
+            li.appendChild(btn);
+            li.appendChild(document.createTextNode(` - Answer: `));
+            const span = document.createElement("span");
+            span.className = "answer-display";
+            span.textContent = `"${playerAnswer}"`;
+            li.appendChild(span);
+            list.appendChild(li);
+          }
+        });
+      } catch (error) {
+        console.error("Error loading voting:", error);
+      }
+    }
+
+    async function submitVote(votedPlayer) {
+      if (hasVoted) return;
+      hasVoted = true;
+
+      try {
+        await update(ref(db, `lobbies/${lobbyCode}/questions/${playerName}`), { vote: votedPlayer });
+        showDiv("postVoteWait");
+        setupAllVotedListener();
+      } catch (error) {
+        console.error("Error submitting vote:", error);
+        hasVoted = false;
+      }
+    }
+
+    function setupAllVotedListener() {
+      allQuestionsRef = ref(db, `lobbies/${lobbyCode}/questions`);
+      onValue(allQuestionsRef, snapshot => {
+        if (!snapshot.exists()) return;
+        
+        const data = snapshot.val();
+        const allVoted = Object.values(data).every(x => x.vote);
+        
+        if (allVoted) {
+          update(ref(db, `lobbies/${lobbyCode}`), { phase: "revealPhase" });
+        }
+      });
+    }
+
+    // Reveal
+    async function loadReveal() {
+      try {
+        const revealEl = document.getElementById("revealText");
+        revealEl.innerHTML = "Calculating votes...";
+    
+        // Get game data to know who the imposter was
+        const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
+        const gameDataSnap = await get(gameDataRef);
+        
+        if (!gameDataSnap.exists()) {
+          revealEl.innerHTML = "Game data not found!";
+          return;
+        }
+        
+        const gameData = gameDataSnap.val();
+        imposter = gameData.imposter;
+    
+        // Get voting data
+        const qRef = ref(db, `lobbies/${lobbyCode}/questions`);
+        const qSnap = await get(qRef);
+        
+        if (!qSnap.exists()) {
+          revealEl.innerHTML = "No question data found!";
+          return;
+        }
+        
+        const qData = qSnap.val();
+        const votes = {};
+        const votedFor = {};
+    
+        for (const [pName, obj] of Object.entries(qData)) {
+          const v = obj.vote;
+          if (!v) continue;
+          if (!votes[v]) votes[v] = 0;
+          votes[v]++;
+          if (!votedFor[v]) votedFor[v] = [];
+          votedFor[v].push(pName);
+        }
+    
+        if (Object.keys(votes).length === 0) {
+          revealEl.innerHTML = "No votes received!";
+          return;
+        }
+    
+        let html = "<h3>Voting Results:</h3>";
+        for (const [player, count] of Object.entries(votes)) {
+          const whoVoted = votedFor[player].join(", ");
+          html += `<p>${player}: ${count} vote(s) - Voted by: ${whoVoted}</p>`;
+        }
+    
+        // Sort by vote count, highest first
+        const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+        
+        // Check for a tie
+        const highestVotes = sorted[0][1];
+        const tiedPlayers = sorted.filter(([_, count]) => count === highestVotes).map(([name, _]) => name);
+        
+        let resultText;
+        let voteCorrect;
+        
+        if (tiedPlayers.length > 1) {
+          // There's a tie
+          const imposterInTie = tiedPlayers.includes(imposter);
+          resultText = `There was a tie between ${tiedPlayers.join(", ")}`;
+          voteCorrect = imposterInTie ? 
+            `The imposter was among the tied players ✅` : 
+            `The imposter was not among the tied players ❌`;
+        } else {
+          // No tie, single player with highest votes
+          const topVoted = sorted[0][0];
+          const correct = (topVoted === imposter);
+          resultText = `${topVoted} was voted out`;
+          voteCorrect = correct ? 
+            `They were the imposter ✅` : 
+            `They were not the imposter ❌`;
+        }
+        
+        html += `<p><strong>${resultText}.</strong> ${voteCorrect}</p>`;
+        html += `<p>The imposter was <strong>${imposter}</strong>, and their question was: "${gameData.imposterQuestion}"</p>`;
+    
+        revealEl.innerHTML = html;
+      } catch (error) {
+        console.error("Error loading reveal:", error);
+      }
+    }
+  </script>
+</body>
+</html> 
