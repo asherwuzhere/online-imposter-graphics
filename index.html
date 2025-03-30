@@ -275,6 +275,54 @@
       color: var(--coral);
     }
     
+    #deckSelection {
+      margin: 1.5em 0;
+      padding: 1em;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: var(--rounded);
+      box-shadow: var(--shadow);
+    }
+    
+    .deck-options {
+      display: flex;
+      justify-content: center;
+      gap: 0.8em;
+      margin: 1em 0;
+    }
+    
+    .deck-btn {
+      background-color: var(--blue);
+      padding: 0.8em 1.2em;
+      border-radius: var(--rounded);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .deck-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .deck-btn.active {
+      background-color: var(--teal);
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    #deckDescription {
+      font-style: italic;
+      color: var(--dark-text);
+      margin-top: 0.5em;
+    }
+    
+    .deck-info {
+      margin-top: 1em;
+      padding: 0.5em 1em;
+      background-color: rgba(77, 182, 172, 0.2);
+      border-radius: var(--rounded);
+      display: inline-block;
+    }
+    
     @media (max-width: 600px) {
       body {
         padding: 1em;
@@ -328,6 +376,17 @@
     <h2>Lobby Code: <span id="lobbyCodeDisplay"></span></h2>
     <h3>Players:</h3>
     <ul id="playerList"></ul>
+    
+    <div id="deckSelection" class="hidden">
+      <h3>Select Question Deck:</h3>
+      <div class="deck-options">
+        <button id="numbersDeckBtn" class="deck-btn">Numbers</button>
+        <button id="wordsDeckBtn" class="deck-btn">Words</button>
+        <button id="mixedDeckBtn" class="deck-btn active">Mixed</button>
+      </div>
+      <p id="deckDescription">Mixed: Randomly selects between Numbers and Words decks each game</p>
+    </div>
+    
     <button id="startGameBtn" class="hidden">Start Game</button>
   </div>
 
@@ -407,444 +466,114 @@
     let allQuestionsRef = null;
 
     // Question pairs for the game
-    const questions = [
-      {
-        q1: "How many times have you been horseback riding in your life?",
-        q2: "How many sleepaway camps have you been to?"
-      },
-      {
-        q1: "What's your favorite board game?",
-        q2: "What's your favorite card game?"
-      },
-      {
-        q1: "What's the most interesting place you've traveled to?",
-        q2: "What's your dream vacation destination?"
-      },
-      {
-        q1: "How many books do you read in a typical year?",
-        q2: "How many movies do you watch in a typical month?"
-      },
-      {
-        q1: "What was your first job?",
-        q2: "What was your worst job?"
-      },
-      {
-        q1: "What's your favorite childhood memory?",
-        q2: "What's the most embarrassing thing that happened to you as a child?"
-      },
-      {
-        q1: "If you could have dinner with any historical figure, who would it be?",
-        q2: "If you could have any fictional character as a best friend, who would it be?"
-      },
-      {
-        q1: "What's the best gift you've ever received?",
-        q2: "What's the best gift you've ever given someone?"
-      },
-      {
-        q1: "How many hours of sleep do you typically get each night?",
-        q2: "How many cups of coffee do you drink in a typical day?"
-      },
-      {
-        q1: "What's your favorite season and why?",
-        q2: "What's your favorite holiday and why?"
-      },
-      {
-        q1: "If you could only eat one food for the rest of your life, what would it be?",
-        q2: "What's your go-to comfort food?"
-      },
-      {
-        q1: "What's your favorite mode of transportation?",
-        q2: "What's your dream car?"
-      },
-      {
-        q1: "How old were you when you got your first smartphone?",
-        q2: "How old were you when you got your first pet?"
-      },
-      {
-        q1: "What's something you're really good at?",
-        q2: "What's something you wish you were better at?"
-      },
-      {
-        q1: "What's your go-to karaoke song?",
-        q2: "What artist have you seen perform live most often?"
-      },
-      {
-        q1: "How do you prefer to exercise?",
-        q2: "What's your favorite sport to watch?"
-      },
-      {
-        q1: "What's your ideal weekend activity?",
-        q2: "What do you typically do to relax after a stressful day?"
-      },
-      {
-        q1: "What's your favorite type of museum to visit?",
-        q2: "What's your favorite type of restaurant to eat at?"
-      },
-      {
-        q1: "What's a skill you taught yourself?",
-        q2: "What's something you've always wanted to learn?"
-      },
-      {
-        q1: "How many countries have you visited?",
-        q2: "How many states or provinces have you visited in your home country?"
-      },
-      {
-        q1: "What was your favorite subject in school?",
-        q2: "What was your least favorite subject in school?"
-      },
-      {
-        q1: "What's the longest you've gone without sleep?",
-        q2: "What's the longest road trip you've taken?"
-      },
-      {
-        q1: "What's your most-used app on your phone?",
-        q2: "What website do you visit most frequently?"
-      },
-      {
-        q1: "What's the best concert you've ever attended?",
-        q2: "What's the best movie you've seen in theaters?"
-      },
-      {
-        q1: "How would you spend a million dollars?",
-        q2: "If you won the lottery, what's the first thing you would buy?"
-      },
-      {
-        q1: "What's your favorite time of day?",
-        q2: "Are you a morning person or a night owl?"
-      },
-      {
-        q1: "What's your favorite dessert?",
-        q2: "What's your favorite breakfast food?"
-      },
-      {
-        q1: "What was your childhood dream job?",
-        q2: "What would be your dream job now?"
-      },
-      {
-        q1: "What's the best piece of advice you've ever received?",
-        q2: "What's a life lesson you had to learn the hard way?"
-      },
-      {
-        q1: "What's something you collect?",
-        q2: "What's the most valuable thing you own that isn't worth much money?"
-      },
-      {
-        q1: "What's your favorite way to spend time outdoors?",
-        q2: "What's your favorite indoor activity on a rainy day?"
-      },
-      {
-        q1: "What's a tradition your family has?",
-        q2: "What's a tradition you'd like to start?"
-      },
-      {
-        q1: "If you could instantly become an expert in something, what would it be?",
-        q2: "If you could have any superpower, what would it be?"
-      },
-      {
-        q1: "What was the last book you read?",
-        q2: "What was the last movie you watched?"
-      },
-      {
-        q1: "What's something that's popular that you don't understand the appeal of?",
-        q2: "What's something you enjoy that most people don't?"
-      },
-      {
-        q1: "How long does it usually take you to get ready in the morning?",
-        q2: "How long is your typical commute to work or school?"
-      },
-      {
-        q1: "What's your favorite type of music?",
-        q2: "What was the first album or song you purchased?"
-      },
-      {
-        q1: "What's your favorite thing about where you live?",
-        q2: "Where would you most like to live someday?"
-      },
-      {
-        q1: "What are you most proud of?",
-        q2: "What's your biggest accomplishment from the past year?"
-      },
-      {
-        q1: "What's your favorite childhood game?",
-        q2: "What's your favorite video game?"
-      },
-      {
-        q1: "What's something that always makes you laugh?",
-        q2: "What's the best joke you know?"
-      },
-      {
-        q1: "What's something you know a lot about?",
-        q2: "What topic could you give a 20-minute presentation on without preparation?"
-      },
-      {
-        q1: "What's your favorite item of clothing that you own?",
-        q2: "What's an item you've had for the longest time?"
-      },
-      {
-        q1: "What skill do you think everyone should learn?",
-        q2: "What's something everyone should experience at least once?"
-      },
-      {
-        q1: "What's the best compliment you've ever received?",
-        q2: "What's something nice someone did for you recently?"
-      },
-      {
-        q1: "What's your favorite smell?",
-        q2: "What smell brings back the strongest memories for you?"
-      },
-      {
-        q1: "What's the most spontaneous thing you've ever done?",
-        q2: "What's the most daring thing you've ever done?"
-      },
-      {
-        q1: "What are three items you would bring to a deserted island?",
-        q2: "What are three things you couldn't live without for a week?"
-      },
-      {
-        q1: "If you could time travel, what year would you visit?",
-        q2: "If you could live in any historical period, which would you choose?"
-      },
-      {
-        q1: "What animal do you think would make the best pet if it was domesticated?",
-        q2: "If you could be any animal for a day, what would you choose?"
-      },
-      {
-        q1: "What's your favorite way to spend a day off?",
-        q2: "What's your ideal vacation?"
-      },
-      {
-        q1: "What's a fear you've overcome?",
-        q2: "What's something that scares you but you'd like to try anyway?"
-      },
-      {
-        q1: "Who was your childhood hero?",
-        q2: "Who do you admire most now?"
-      },
-      {
-        q1: "What's your favorite word?",
-        q2: "What's a word or phrase you say too often?"
-      },
-      {
-        q1: "What's something you've created that you're proud of?",
-        q2: "What's a project you'd like to work on someday?"
-      },
-      {
-        q1: "What would your perfect day look like?",
-        q2: "What are three things that would make tomorrow great?"
-      },
-      {
-        q1: "What's something you've always wanted to try but haven't yet?",
-        q2: "What's on your bucket list?"
-      },
-      {
-        q1: "What's the best piece of technology you own?",
-        q2: "What's a piece of technology you wish existed?"
-      },
-      {
-        q1: "What's something that made you smile recently?",
-        q2: "What's something you're looking forward to?"
-      },
-      {
-        q1: "How many languages do you speak?",
-        q2: "What language would you like to learn?"
-      },
-      {
-        q1: "What's your favorite quote?",
-        q2: "What's a saying or phrase that you live by?"
-      },
-      {
-        q1: "What's the most interesting fact you know?",
-        q2: "What's something surprising about you that most people don't know?"
-      },
-      {
-        q1: "What's your earliest memory?",
-        q2: "What's a vivid memory from your childhood?"
-      },
-      {
-        q1: "If you could master one musical instrument, which would you choose?",
-        q2: "If you could sing a duet with any musician, who would it be?"
-      },
-      {
-        q1: "What's the most beautiful place you've ever seen?",
-        q2: "What's a place you find peaceful?"
-      },
-      {
-        q1: "What habit would you like to break?",
-        q2: "What habit would you like to develop?"
-      },
-      {
-        q1: "What's the best meal you've ever had?",
-        q2: "What's a food you've always wanted to try?"
-      },
-      {
-        q1: "What's your favorite thing about your job or studies?",
-        q2: "What would you change about your job or studies if you could?"
-      },
-      {
-        q1: "What's something you've done that you never thought you would?",
-        q2: "What's something you never thought you'd enjoy but ended up loving?"
-      },
-      {
-        q1: "What's a small thing that makes your day better?",
-        q2: "What's a small inconvenience that always annoys you?"
-      },
-      {
-        q1: "How many pillows do you sleep with?",
-        q2: "Do you make your bed every morning?"
-      },
-      {
-        q1: "What's your favorite board game?",
-        q2: "What's your favorite outdoor game?"
-      },
-      {
-        q1: "What's a song that always puts you in a good mood?",
-        q2: "What's a song that always makes you emotional?"
-      },
-      {
-        q1: "What's the longest you've gone without checking your phone?",
-        q2: "What's the longest you've gone without using the internet?"
-      },
-      {
-        q1: "What's something you learned recently?",
-        q2: "What's something you'd like to learn more about?"
-      },
-      {
-        q1: "What was your favorite toy as a child?",
-        q2: "What was your favorite TV show as a child?"
-      },
-      {
-        q1: "What do you think is your best physical feature?",
-        q2: "What personality trait are you most proud of?"
-      },
-      {
-        q1: "How often do you try new foods?",
-        q2: "How adventurous would you say you are with trying new things?"
-      },
-      {
-        q1: "What's the most unusual food you've ever eaten?",
-        q2: "What's a food from another culture you enjoy?"
-      },
-      {
-        q1: "What's a cause you're passionate about?",
-        q2: "What's something you would stand in line for hours to get?"
-      },
-      {
-        q1: "What's your favorite type of art?",
-        q2: "If you could own any piece of art, what would it be?"
-      },
-      {
-        q1: "What's the best surprise you've ever received?",
-        q2: "What's the best surprise you've ever planned for someone else?"
-      },
-      {
-        q1: "What's the oldest item you own?",
-        q2: "What's something you own that has sentimental value?"
-      },
-      {
-        q1: "What's your favorite thing about your hometown?",
-        q2: "What's something unique about where you grew up?"
-      },
-      {
-        q1: "What age would you choose to remain forever if you could?",
-        q2: "If you could go back to any age for a day, what would it be?"
-      },
-      {
-        q1: "What's the best birthday gift you've ever received?",
-        q2: "How do you usually celebrate your birthday?"
-      },
-      {
-        q1: "What's a rule you think everyone should follow?",
-        q2: "What's a rule you think is meant to be broken?"
-      },
-      {
-        q1: "What's your favorite time of year?",
-        q2: "What weather makes you the happiest?"
-      },
-      {
-        q1: "What do you think is the greatest invention of all time?",
-        q2: "What invention do you think has done more harm than good?"
-      },
-      {
-        q1: "What fictional character do you most identify with?",
-        q2: "What fictional world would you most like to live in?"
-      },
-      {
-        q1: "What is your favorite way to pass time while traveling?",
-        q2: "What is your favorite way to pass time when you're alone?"
-      },
-      {
-        q1: "What's your favorite family recipe?",
-        q2: "What's a dish you're known for making?"
-      },
-      {
-        q1: "What chore do you hate the most?",
-        q2: "What chore do you mind the least?"
-      },
-      {
-        q1: "What's the most challenging thing you've ever done?",
-        q2: "What's something you failed at but learned from?"
-      },
-      {
-        q1: "What's the best money you've ever spent?",
-        q2: "What's the worst purchase you've ever made?"
-      },
-      {
-        q1: "If you could speak to your younger self, what advice would you give?",
-        q2: "What do you think your future self would want to tell you now?"
-      },
-      {
-        q1: "What's the most valuable life skill you possess?",
-        q2: "What's a skill you wish was taught in school but isn't?"
-      },
-      {
-        q1: "What's a good habit you have?",
-        q2: "What's a bad habit you've broken?"
-      },
-      {
-        q1: "How many plants do you have in your home?",
-        q2: "How many photos are displayed in your home?"
-      },
-      {
-        q1: "What's the longest you've kept a New Year's resolution?",
-        q2: "What's a goal you're currently working toward?"
-      },
-      {
-        q1: "What would your autobiography be titled?",
-        q2: "If a movie was made about your life, who would play you?"
-      },
-      {
-        q1: "What's your go-to dance move?",
-        q2: "If you were in a talent show, what would your talent be?"
-      },
-      {
-        q1: "What's a stereotype about your profession that isn't true?",
-        q2: "What's a stereotype about your hobby that isn't true?"
-      },
-      {
-        q1: "What's something that took you way too long to figure out?",
-        q2: "What's something obvious that you didn't notice until someone pointed it out?"
-      },
-      {
-        q1: "What's the most difficult ethical question you've had to answer?",
-        q2: "What's the hardest decision you've ever had to make?"
-      },
-      {
-        q1: "How many languages do you speak?",
-        q2: "How many instruments can you play?"
-      },
-      {
-        q1: "What's your favorite pizza topping?",
-        q2: "What's your favorite ice cream flavor?"
-      },
-      {
-        q1: "What's the last thing you searched for online?",
-        q2: "What's the most interesting thing you've read recently?"
-      },
-      {
-        q1: "What brand are you most loyal to?",
-        q2: "What's a product you would never use a generic version of?"
-      }
-    ];
+    const questionDecks = {
+      numbers: [
+        { q1: "How many times have you been horseback riding in your life?", q2: "How many sleepaway camps have you been to?" },
+        { q1: "How many books do you read in a typical year?", q2: "How many movies do you watch in a typical month?" },
+        { q1: "How many hours of sleep do you typically get each night?", q2: "How many cups of coffee do you drink in a typical day?" },
+        { q1: "How many countries have you visited?", q2: "How many states or provinces have you visited in your home country?" },
+        { q1: "How many languages do you speak?", q2: "How many instruments can you play?" },
+        { q1: "How many pillows do you sleep with?", q2: "How many pairs of shoes do you own?" },
+        { q1: "How many pets have you had in your lifetime?", q2: "How many houseplants do you currently have?" },
+        { q1: "How many times have you moved homes in your life?", q2: "How many schools did you attend growing up?" },
+        { q1: "What's your ideal number of children to have?", q2: "How many cousins do you have?" },
+        { q1: "How many streaming services do you subscribe to?", q2: "How many apps do you use daily on your phone?" },
+        { q1: "How many hours per day do you spend on your phone?", q2: "How many times do you check social media daily?" },
+        { q1: "How many times have you been to a live concert?", q2: "How many musical instruments have you tried playing?" },
+        { q1: "How many close friends would you say you have?", q2: "How many people do you regularly keep in touch with?" },
+        { q1: "How many hours do you work per week?", q2: "How many days of vacation do you take per year?" },
+        { q1: "How many alarms do you set to wake up?", q2: "How many times do you hit snooze each morning?" },
+        { q1: "How many cups of water do you drink daily?", q2: "How many caffeinated beverages do you have in a typical day?" },
+        { q1: "How many times have you been on an airplane?", q2: "How many road trips have you taken?" },
+        { q1: "How many movies do you watch in a typical month?", q2: "How many TV shows are you currently following?" },
+        { q1: "How many photos would you guess are on your phone right now?", q2: "How many photos would you say you take in a typical week?" },
+        { q1: "How many times per week do you eat out?", q2: "How many times per week do you cook at home?" },
+        { q1: "How many pieces of technology do you own?", q2: "How many subscriptions do you pay for monthly?" },
+        { q1: "How many minutes is your daily commute?", q2: "How many miles/kilometers do you live from your workplace/school?" },
+        { q1: "How many times have you broken a bone?", q2: "How many times have you been to a hospital?" },
+        { q1: "How many weddings have you attended?", q2: "How many birthday parties do you go to annually?" },
+        { q1: "How many pairs of jeans do you own?", q2: "How many shirts are in your closet?" },
+        { q1: "How many times a week do you exercise?", q2: "How many different types of exercise do you do regularly?" },
+        { q1: "How many hours do you spend outdoors in a typical week?", q2: "How many parks or natural areas have you visited in the last year?" },
+        { q1: "How many items are on your bucket list?", q2: "How many goals have you set for this year?" },
+        { q1: "How many siblings do you have?", q2: "How many people live in your household?" },
+        { q1: "How many days per week do you eat breakfast?", q2: "How many times do you snack between meals daily?" },
+        { q1: "How many languages would you like to learn?", q2: "How many languages can you understand at least partially?" },
+        { q1: "How many hours do you spend reading per week?", q2: "How many books are on your 'to read' list?" },
+        { q1: "How many minutes do you spend brushing your teeth?", q2: "How many times have you been to the dentist in the past 2 years?" },
+        { q1: "How many best friends have you had in your life?", q2: "How many of your childhood friends are you still in contact with?" },
+        { q1: "How many hobbies would you say you have?", q2: "How many hours per week do you spend on hobbies?" },
+        { q1: "How many steps do you take on an average day?", q2: "How many minutes do you typically walk daily?" },
+        { q1: "How many months have you lived at your current address?", q2: "How many times have you redecorated your living space?" },
+        { q1: "How many different jobs have you had?", q2: "How many career fields have you worked in?" },
+        { q1: "How many emails do you receive daily?", q2: "How many unread notifications do you currently have?" },
+        { q1: "How many tabs do you typically have open on your browser?", q2: "How many apps do you have installed on your phone?" },
+        { q1: "How many times do you hit snooze in the morning?", q2: "How many hours of sleep do you need to feel well-rested?" },
+        { q1: "How many tattoos do you have?", q2: "How many piercings do you have?" },
+        { q1: "How many glasses of water do you drink daily?", q2: "How many sodas do you drink in a typical week?" },
+        { q1: "How many times do you brush your teeth daily?", q2: "How many times do you floss per week?" },
+        { q1: "How many times have you voted in an election?", q2: "How many times have you participated in a protest or rally?" },
+        { q1: "How many times have you been stung by a bee?", q2: "How many mosquito bites do you typically get each summer?" },
+        { q1: "How many streaming services do you currently subscribe to?", q2: "How many hours of TV/movies do you watch weekly?" },
+        { q1: "How many video games have you completed?", q2: "How many board games do you own?" },
+        { q1: "How many times have you lost your cell phone?", q2: "How many phone screens have you cracked?" }
+      ],
+      words: [
+        { q1: "What's your favorite board game?", q2: "What's your favorite card game?" },
+        { q1: "What's the most interesting place you've traveled to?", q2: "What's your dream vacation destination?" },
+        { q1: "What was your first job?", q2: "What was your worst job?" },
+        { q1: "What's your favorite childhood memory?", q2: "What's the most embarrassing thing that happened to you as a child?" },
+        { q1: "If you could have dinner with any historical figure, who would it be?", q2: "If you could have any fictional character as a best friend, who would it be?" },
+        { q1: "What's the best gift you've ever received?", q2: "What's the best gift you've ever given someone?" },
+        { q1: "What's your favorite season and why?", q2: "What's your favorite holiday and why?" },
+        { q1: "What's your go-to karaoke song?", q2: "What artist have you seen perform live most often?" },
+        { q1: "What's your favorite type of cuisine?", q2: "What's your favorite dessert?" },
+        { q1: "What hobby would you like to try but haven't yet?", q2: "What skill would you like to master?" },
+        { q1: "What's your favorite movie of all time?", q2: "What TV show could you watch over and over again?" },
+        { q1: "What's your ideal weekend activity?", q2: "What's your favorite way to relax after a long day?" },
+        { q1: "What's your favorite book?", q2: "Who is your favorite author?" },
+        { q1: "What's the best piece of advice you've ever received?", q2: "What's a lesson you had to learn the hard way?" },
+        { q1: "What's your favorite ice cream flavor?", q2: "What's your go-to comfort food?" },
+        { q1: "What's a superpower you wish you had?", q2: "If you were an animal, what would you be and why?" },
+        { q1: "What's your favorite childhood toy?", q2: "What's your favorite childhood cartoon?" },
+        { q1: "What's your dream car?", q2: "What's your preferred method of transportation?" },
+        { q1: "What's the most beautiful place you've ever seen?", q2: "What natural wonder would you most like to visit?" },
+        { q1: "What subject were you best at in school?", q2: "What subject did you struggle with the most?" },
+        { q1: "What's your favorite genre of music?", q2: "Who is your favorite musical artist?" },
+        { q1: "What's your favorite quote or saying?", q2: "What's a phrase or saying you use too often?" },
+        { q1: "What's your idea of a perfect day?", q2: "What's your favorite time of day?" },
+        { q1: "What's your favorite sport to watch?", q2: "What's your favorite sport to play?" },
+        { q1: "What's your favorite family tradition?", q2: "What's a tradition you'd like to start?" },
+        { q1: "What's the best concert you've ever attended?", q2: "What artist would you love to see perform live?" },
+        { q1: "What's your favorite thing about your hometown?", q2: "Where would you like to live someday?" },
+        { q1: "What's your favorite thing about your job/studies?", q2: "What would be your dream job?" },
+        { q1: "What's a fear you've overcome?", q2: "What's something you're still afraid of?" },
+        { q1: "What's your favorite type of weather?", q2: "What's your least favorite season?" },
+        { q1: "What's your favorite home-cooked meal?", q2: "What's your signature dish to cook?" },
+        { q1: "What's the best restaurant you've ever been to?", q2: "What type of restaurant do you visit most often?" },
+        { q1: "What's your favorite clothing item you own?", q2: "What's your go-to outfit?" },
+        { q1: "What was your favorite subject in school?", q2: "What subject do you wish you had paid more attention to?" },
+        { q1: "What's your favorite holiday tradition?", q2: "What's your favorite holiday food?" },
+        { q1: "What's your favorite outdoor activity?", q2: "What's your favorite indoor activity for a rainy day?" },
+        { q1: "What's the best advice you've ever received?", q2: "What advice would you give your younger self?" },
+        { q1: "What's the most useful thing you own?", q2: "What's something you own that has sentimental value?" },
+        { q1: "What app on your phone do you use the most?", q2: "What website do you visit most frequently?" },
+        { q1: "What's your favorite podcast?", q2: "What's your favorite YouTube channel?" },
+        { q1: "What's the best view you've ever seen?", q2: "What's a place you find peaceful?" },
+        { q1: "What smell brings back the strongest memories for you?", q2: "What's your favorite scent?" },
+        { q1: "What fictional world would you most like to visit?", q2: "What fictional character do you most relate to?" },
+        { q1: "What's the best compliment you've ever received?", q2: "What's a quality you admire in others?" },
+        { q1: "What's a small thing that makes your day better?", q2: "What's a minor inconvenience that always annoys you?" },
+        { q1: "What's the last book you read?", q2: "What book had the biggest impact on you?" },
+        { q1: "What's your favorite breakfast food?", q2: "What's the strangest food combination you enjoy?" },
+        { q1: "What's your favorite holiday?", q2: "What's your favorite family tradition?" },
+        { q1: "What's the first thing you do when you wake up?", q2: "What's your bedtime routine?" },
+        { q1: "What's a cause you're passionate about?", q2: "What's something you'd like to change about the world?" }
+      ]
+    };
+    
+    // Track the selected question deck
+    let selectedDeck = "mixed";
 
     // DOM references
     const homeDiv       = document.getElementById('home');
@@ -885,7 +614,8 @@
         await set(ref(db, `lobbies/${lobbyCode}`), {
           players: { [playerName]: true },
           host: playerName,
-          phase: "lobby"
+          phase: "lobby",
+          questionDeck: selectedDeck  // Set the initial deck selection
         });
         enterLobby();
       } catch (error) {
@@ -933,6 +663,14 @@
       showDiv("lobby");
       document.getElementById("lobbyCodeDisplay").innerText = lobbyCode;
 
+      // Clear any existing answer data in the UI
+      document.getElementById("answerList").innerHTML = "";
+      document.getElementById("mainQuestionInAnswers").style.display = "none";
+      document.getElementById("voteList").innerHTML = "";
+      
+      // Clear any existing vote data
+      hasVoted = false;
+
       const playerList = document.getElementById("playerList");
       const playersRef = ref(db, `lobbies/${lobbyCode}/players`);
       
@@ -949,14 +687,62 @@
       });
 
       const startBtn = document.getElementById("startGameBtn");
+      const deckSelectionDiv = document.getElementById("deckSelection");
+      
       if (isHost) {
         startBtn.classList.remove("hidden");
+        deckSelectionDiv.classList.remove("hidden");
         startBtn.onclick = startGame;
+        
+        // Setup deck selection buttons
+        document.getElementById("numbersDeckBtn").onclick = () => selectDeck("numbers");
+        document.getElementById("wordsDeckBtn").onclick = () => selectDeck("words");
+        document.getElementById("mixedDeckBtn").onclick = () => selectDeck("mixed");
+        
+        // Set the initial active deck
+        selectDeck(selectedDeck);
       } else {
         startBtn.classList.add("hidden");
+        deckSelectionDiv.classList.add("hidden");
       }
 
       listenForPhaseChange();
+    }
+    
+    async function selectDeck(deckName) {
+      selectedDeck = deckName;
+      
+      // Update UI
+      document.querySelectorAll(".deck-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+      
+      document.getElementById(`${deckName}DeckBtn`).classList.add("active");
+      
+      // Update description
+      const description = document.getElementById("deckDescription");
+      switch(deckName) {
+        case "numbers":
+          description.textContent = "Numbers: Questions about quantities and numerical values";
+          break;
+        case "words":
+          description.textContent = "Words: Questions about preferences and experiences";
+          break;
+        case "mixed":
+          description.textContent = "Mixed: Randomly selects between Numbers and Words decks each game";
+          break;
+      }
+      
+      // If host, update the database
+      if (isHost) {
+        try {
+          await update(ref(db, `lobbies/${lobbyCode}`), {
+            questionDeck: deckName
+          });
+        } catch (error) {
+          console.error("Error updating question deck:", error);
+        }
+      }
     }
 
     async function startGame() {
@@ -977,9 +763,19 @@
         // Pick a random imposter
         imposter = players[Math.floor(Math.random() * players.length)];
         
-        // Select a random question pair
-        const randomQuestionIndex = Math.floor(Math.random() * questions.length);
-        const selectedQuestionPair = questions[randomQuestionIndex];
+        // Get the selected question deck
+        let deckToUse = selectedDeck;
+        
+        // If mixed is selected, randomly choose between numbers and words
+        if (selectedDeck === "mixed") {
+          deckToUse = Math.random() < 0.5 ? "numbers" : "words";
+        }
+        
+        const deckQuestions = questionDecks[deckToUse];
+        
+        // Select a random question pair from the selected deck
+        const randomQuestionIndex = Math.floor(Math.random() * deckQuestions.length);
+        const selectedQuestionPair = deckQuestions[randomQuestionIndex];
         
         // Randomly decide which question is the main and which is the imposter question
         const isFirstQuestionMain = Math.random() >= 0.5;
@@ -987,25 +783,35 @@
         const mainQuestion = isFirstQuestionMain ? selectedQuestionPair.q1 : selectedQuestionPair.q2;
         const imposterQuestion = isFirstQuestionMain ? selectedQuestionPair.q2 : selectedQuestionPair.q1;
         
-        // Store the questions and imposter for reference later
+        // First, clear any existing question data
+        await set(ref(db, `lobbies/${lobbyCode}/questions`), null);
+        
+        // Then, store the fresh questions and imposter for the new game
         await update(ref(db, `lobbies/${lobbyCode}`), {
           mainQuestion: mainQuestion,
           imposterQuestion: imposterQuestion,
           imposter: imposter,
           questionIndex: randomQuestionIndex,
-          isFirstQuestionMain: isFirstQuestionMain
+          questionDeck: selectedDeck,
+          actualDeckUsed: deckToUse,
+          isFirstQuestionMain: isFirstQuestionMain,
+          mainQuestionRevealed: false
         });
 
         // Assign questions to each player
+        const questionsData = {};
         for (const p of players) {
           const q = (p === imposter) ? imposterQuestion : mainQuestion;
-          await set(ref(db, `lobbies/${lobbyCode}/questions/${p}`), {
+          questionsData[p] = {
             question: q,
             answer: "",
             ready: false,
             vote: null
-          });
+          };
         }
+        
+        // Set all questions at once to avoid race conditions
+        await set(ref(db, `lobbies/${lobbyCode}/questions`), questionsData);
 
         // Move to question phase
         await update(ref(db, `lobbies/${lobbyCode}`), { phase: "questionPhase" });
@@ -1049,6 +855,20 @@
           loadReveal();
         }
       });
+      
+      // Listen for question deck changes (host only)
+      if (isHost) {
+        const deckRef = ref(db, `lobbies/${lobbyCode}/questionDeck`);
+        onValue(deckRef, snapshot => {
+          if (!snapshot.exists()) return;
+          
+          const remoteDeck = snapshot.val();
+          if (remoteDeck && remoteDeck !== selectedDeck) {
+            selectedDeck = remoteDeck;
+            selectDeck(selectedDeck);
+          }
+        });
+      }
       
       // Also listen for the main question revealed state
       const mainQuestionRevealedRef = ref(db, `lobbies/${lobbyCode}/mainQuestionRevealed`);
@@ -1215,10 +1035,18 @@
         }
 
         const allQs = qSnap.val();
-        for (const [pName, obj] of Object.entries(allQs)) {
-          const li = document.createElement("li");
-          li.textContent = `${pName}: ${obj.answer}`;
-          ansListEl.appendChild(li);
+        
+        // Create a new answer list, ensuring only one entry per player
+        const playerList = document.getElementById("playerList").querySelectorAll("li");
+        const currentPlayers = Array.from(playerList).map(li => li.textContent.replace(" (You)", ""));
+        
+        // Only show answers for players currently in the game
+        for (const pName of currentPlayers) {
+          if (allQs[pName] && allQs[pName].answer) {
+            const li = document.createElement("li");
+            li.textContent = `${pName}: ${allQs[pName].answer}`;
+            ansListEl.appendChild(li);
+          }
         }
 
         // Only host sees the Reveal Main button if it's not already revealed
@@ -1296,7 +1124,7 @@
         
         const playerNames = Object.keys(playersSnap.val());
     
-        // Get all player answers
+        // Get all player answers for the current game
         const answersSnap = await get(ref(db, `lobbies/${lobbyCode}/questions`));
         if (!answersSnap.exists()) {
           console.error("No answers found");
@@ -1307,6 +1135,13 @@
         // Get the main question for display at the top
         const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
         const gameDataSnap = await get(gameDataRef);
+        
+        // Clear any existing main question display
+        const existingMainQuestion = document.querySelector(".voting-main-question");
+        if (existingMainQuestion) {
+          existingMainQuestion.remove();
+        }
+        
         if (gameDataSnap.exists() && gameDataSnap.val().mainQuestion) {
           // Add the main question at the top of the voting page
           const mainQuestionDiv = document.createElement("div");
@@ -1326,9 +1161,9 @@
     
         // Create voting buttons for all players except self
         playerNames.forEach(p => {
-          if (p !== playerName) {
+          if (p !== playerName && answerData[p] && answerData[p].answer) {
             const li = document.createElement("li");
-            const playerAnswer = answerData[p] ? answerData[p].answer : "No answer";
+            const playerAnswer = answerData[p].answer;
             
             const btn = document.createElement("button");
             btn.textContent = `Vote ${p}`;
@@ -1394,23 +1229,31 @@
       if (!isHost) return;
       
       try {
-        // Reset the game state but keep the players
-        const snapshot = await get(ref(db, `lobbies/${lobbyCode}/players`));
-        if (!snapshot.exists()) {
+        // Get the current players before reset
+        const playersSnapshot = await get(ref(db, `lobbies/${lobbyCode}/players`));
+        if (!playersSnapshot.exists()) {
           console.error("No players found for restart");
           return;
         }
         
-        await update(ref(db, `lobbies/${lobbyCode}`), {
-          phase: "lobby",
-          mainQuestion: null,
-          imposterQuestion: null,
-          imposter: null,
-          questionIndex: null,
-          isFirstQuestionMain: null,
-          questions: null,
-          mainQuestionRevealed: false
+        // Get the current question deck information
+        const gameDataRef = ref(db, `lobbies/${lobbyCode}`);
+        const gameDataSnap = await get(gameDataRef);
+        const currentDeck = gameDataSnap.exists() && gameDataSnap.val().questionDeck ? 
+          gameDataSnap.val().questionDeck : selectedDeck;
+        
+        const players = playersSnapshot.val();
+        
+        // Completely reset the lobby, but keep the host, code and selected deck
+        await set(ref(db, `lobbies/${lobbyCode}`), {
+          players: players,       // Keep the same players
+          host: playerName,       // Keep the same host
+          phase: "lobby",         // Go back to lobby phase
+          questionDeck: currentDeck  // Keep the current deck selection
         });
+        
+        // Set the local deck selection
+        selectedDeck = currentDeck;
         
         // Go back to lobby
         enterLobby();
@@ -1500,6 +1343,20 @@
         
         html += `<p><strong>${resultText}.</strong> ${voteCorrect}</p>`;
         html += `<p>The imposter was <strong>${imposter}</strong>, and their question was: "${gameData.imposterQuestion}"</p>`;
+        
+        // Add deck information
+        const deckName = gameData.questionDeck || "mixed";
+        let deckDisplayName;
+        
+        if (deckName === "mixed" && gameData.actualDeckUsed) {
+          // For mixed, show which deck was actually used
+          const actualDeckUsed = gameData.actualDeckUsed;
+          deckDisplayName = `Mixed (${actualDeckUsed.charAt(0).toUpperCase() + actualDeckUsed.slice(1)})`;
+        } else {
+          deckDisplayName = deckName.charAt(0).toUpperCase() + deckName.slice(1);
+        }
+        
+        html += `<p class="deck-info">Question Deck: <strong>${deckDisplayName}</strong></p>`;
     
         revealEl.innerHTML = html;
         
